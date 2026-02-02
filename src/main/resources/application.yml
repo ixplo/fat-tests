@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: fat-tests
+
+server:
+  port: 8080
+
+app:
+  environment: default
+  greeting:
+    prefix: Hello
+    suffix: "!"
+  feature:
+    enabled: true

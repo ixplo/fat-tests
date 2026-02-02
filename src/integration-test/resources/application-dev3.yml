@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: fat-tests-dev3
+
+server:
+  port: 8083
+
+app:
+  environment: dev3
+  greeting:
+    prefix: Dev3
+    suffix: "!"
+  feature:
+    enabled: true

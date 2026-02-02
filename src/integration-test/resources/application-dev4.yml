@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: fat-tests-dev4
+
+server:
+  port: 8084
+
+app:
+  environment: dev4
+  greeting:
+    prefix: Dev4
+    suffix: "!!!"
+  feature:
+    enabled: false
