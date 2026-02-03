@@ -6,13 +6,17 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="fat-tests" />
+        <module name="fat-tests-app" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="fat-tests" target="1.5" />
+    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
-      <module name="fat-tests" options="-parameters" />
+      <module name="fat-tests" options="" />
+      <module name="fat-tests-app" options="-parameters" />
     </option>
   </component>
 </project>
