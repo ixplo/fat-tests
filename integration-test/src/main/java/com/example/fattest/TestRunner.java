@@ -53,9 +53,7 @@ public class TestRunner {
         SummaryGeneratingListener listener = new SummaryGeneratingListener();
 
         // Use selectPackage with the discovered classes
-        LauncherDiscoveryRequestBuilder requestBuilder = LauncherDiscoveryRequestBuilder.request()
-                .selectors(DiscoverySelectors.selectPackage(TEST_PACKAGE))
-                .filters(ClassNameFilter.includeClassNamePatterns(".*Test$"));
+        LauncherDiscoveryRequestBuilder requestBuilder = LauncherDiscoveryRequestBuilder.request();
 
         // Also add individual class selectors to ensure discovery works in fat jar
         for (Class<?> testClass : testClasses) {
