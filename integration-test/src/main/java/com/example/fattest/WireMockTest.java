@@ -1,6 +1,11 @@
 package com.example.fattest;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
+import com.github.tomakehurst.wiremock.stubbing.StubMapping;
+import io.github.classgraph.ClassGraph;
+import io.github.classgraph.Resource;
+import io.github.classgraph.ScanResult;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -11,22 +16,45 @@ import org.wiremock.spring.ConfigureWireMock;
 import org.wiremock.spring.EnableWireMock;
 import org.wiremock.spring.InjectWireMock;
 
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @EnableWireMock({
-    @ConfigureWireMock(
-        name = "api-service",
-        filesUnderClasspath = "wiremock"
-    )
+    @ConfigureWireMock(name = "api-service")
 })
 class WireMockTest {
+
+    private static final String MAPPINGS_PATH = "wiremock/mappings";
 
     @InjectWireMock("api-service")
     private WireMockServer wireMockServer;
 
     private final RestTemplate restTemplate = new RestTemplate();
+
+    @BeforeEach
+    void loadMappings() {
+        // Load mappings from classpath using ClassGraph (works in fat jars)
+        try (ScanResult scanResult = new ClassGraph()
+                .acceptPaths(MAPPINGS_PATH)
+                .scan()) {
+
+            List<Resource> resources = scanResult.getResourcesWithExtension("json").stream().toList();
+
+            for (Resource resource : resources) {
+                try {
+                    String json = new String(resource.load(), StandardCharsets.UTF_8);
+                    StubMapping stubMapping = StubMapping.buildFrom(json);
+                    wireMockServer.addStubMapping(stubMapping);
+                } catch (Exception e) {
+                    System.err.println("Failed to load mapping " + resource.getPath() + ": " + e.getMessage());
+                }
+            }
+        }
+    }
 
     private String getBaseUrl() {
         return "http://localhost:" + wireMockServer.port();
