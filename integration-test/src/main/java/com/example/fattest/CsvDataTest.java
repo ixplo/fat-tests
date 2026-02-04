@@ -2,11 +2,12 @@ package com.example.fattest;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.core.io.ClassPathResource;
 
 import java.io.BufferedReader;
-import java.io.InputStreamReader;
+import java.io.File;
+import java.io.FileReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,10 +17,14 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 class CsvDataTest {
 
+    @Autowired
+    private TestResourceLoader resourceLoader;
+
     @Test
-    @DisplayName("Should load users.csv and verify data")
+    @DisplayName("Should load users.csv using File and verify data")
     void shouldLoadUsersData() throws Exception {
-        List<String[]> users = loadCsv("data/users.csv");
+        File file = resourceLoader.getFile("data/users.csv");
+        List<String[]> users = loadCsvFromFile(file);
 
         assertFalse(users.isEmpty(), "Users list should not be empty");
         assertEquals(6, users.size(), "Should have header + 5 users");
@@ -35,13 +40,14 @@ class CsvDataTest {
         assertEquals("alice@example.com", alice[2]);
         assertEquals("true", alice[3]);
 
-        System.out.println("Loaded " + (users.size() - 1) + " users from CSV");
+        System.out.println("Loaded " + (users.size() - 1) + " users from: " + file.getAbsolutePath());
     }
 
     @Test
-    @DisplayName("Should load products.csv and verify data")
+    @DisplayName("Should load products.csv using File and verify data")
     void shouldLoadProductsData() throws Exception {
-        List<String[]> products = loadCsv("data/products.csv");
+        File file = resourceLoader.getFile("data/products.csv");
+        List<String[]> products = loadCsvFromFile(file);
 
         assertFalse(products.isEmpty(), "Products list should not be empty");
         assertEquals(6, products.size(), "Should have header + 5 products");
@@ -56,13 +62,14 @@ class CsvDataTest {
         assertEquals("999.99", laptop[2]);
         assertEquals("Electronics", laptop[3]);
 
-        System.out.println("Loaded " + (products.size() - 1) + " products from CSV");
+        System.out.println("Loaded " + (products.size() - 1) + " products from: " + file.getAbsolutePath());
     }
 
     @Test
     @DisplayName("Should filter active users from CSV")
     void shouldFilterActiveUsers() throws Exception {
-        List<String[]> users = loadCsv("data/users.csv");
+        File file = resourceLoader.getFile("data/users.csv");
+        List<String[]> users = loadCsvFromFile(file);
 
         long activeCount = users.stream()
                 .skip(1) // skip header
@@ -76,7 +83,8 @@ class CsvDataTest {
     @Test
     @DisplayName("Should calculate total price of electronics")
     void shouldCalculateElectronicsTotal() throws Exception {
-        List<String[]> products = loadCsv("data/products.csv");
+        File file = resourceLoader.getFile("data/products.csv");
+        List<String[]> products = loadCsvFromFile(file);
 
         double total = products.stream()
                 .skip(1) // skip header
@@ -88,12 +96,11 @@ class CsvDataTest {
         System.out.println("Electronics total: $" + total);
     }
 
-    private List<String[]> loadCsv(String path) throws Exception {
+    private List<String[]> loadCsvFromFile(File file) throws Exception {
         List<String[]> rows = new ArrayList<>();
-        ClassPathResource resource = new ClassPathResource(path);
 
         try (BufferedReader reader = new BufferedReader(
-                new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8))) {
+                new FileReader(file, StandardCharsets.UTF_8))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 rows.add(line.split(","));
