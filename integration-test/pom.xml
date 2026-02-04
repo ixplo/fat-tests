@@ -17,11 +17,12 @@
     <description>Integration tests runner</description>
 
     <dependencies>
-        <!-- App module dependency -->
+        <!-- App module dependency (plain jar, not the repackaged Spring Boot jar) -->
         <dependency>
             <groupId>com.example</groupId>
             <artifactId>fat-tests-app</artifactId>
             <version>${project.version}</version>
+            <classifier>plain</classifier>
         </dependency>
 
         <!-- Test dependencies -->
