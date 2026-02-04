@@ -1,0 +1,17 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPattern": "/api/error"
+  },
+  "response": {
+    "status": 500,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "error": "Internal Server Error",
+      "message": "An unexpected error occurred",
+      "code": "INTERNAL_ERROR"
+    }
+  }
+}

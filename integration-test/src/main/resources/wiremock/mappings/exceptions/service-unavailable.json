@@ -1,0 +1,18 @@
+{
+  "request": {
+    "method": "ANY",
+    "urlPattern": "/api/maintenance"
+  },
+  "response": {
+    "status": 503,
+    "headers": {
+      "Content-Type": "application/json",
+      "Retry-After": "3600"
+    },
+    "jsonBody": {
+      "error": "Service Unavailable",
+      "message": "Service is under maintenance",
+      "code": "SERVICE_UNAVAILABLE"
+    }
+  }
+}

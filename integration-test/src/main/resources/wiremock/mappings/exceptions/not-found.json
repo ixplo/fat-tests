@@ -1,0 +1,17 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPattern": "/api/users/0"
+  },
+  "response": {
+    "status": 404,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "error": "Not Found",
+      "message": "User with ID 0 does not exist",
+      "code": "RESOURCE_NOT_FOUND"
+    }
+  }
+}

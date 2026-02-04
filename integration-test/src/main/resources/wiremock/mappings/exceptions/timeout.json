@@ -1,0 +1,18 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPattern": "/api/timeout"
+  },
+  "response": {
+    "status": 504,
+    "fixedDelayMilliseconds": 30000,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "error": "Gateway Timeout",
+      "message": "Upstream service did not respond in time",
+      "code": "TIMEOUT"
+    }
+  }
+}

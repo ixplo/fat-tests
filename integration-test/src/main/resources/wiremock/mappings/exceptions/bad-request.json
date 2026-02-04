@@ -1,0 +1,22 @@
+{
+  "request": {
+    "method": "POST",
+    "urlPattern": "/api/users",
+    "bodyPatterns": [
+      {
+        "matchesJsonPath": "$[?(!@.name)]"
+      }
+    ]
+  },
+  "response": {
+    "status": 400,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "error": "Bad Request",
+      "message": "Name field is required",
+      "code": "VALIDATION_ERROR"
+    }
+  }
+}

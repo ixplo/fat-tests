@@ -1,0 +1,23 @@
+{
+  "request": {
+    "method": "ANY",
+    "urlPattern": "/api/secure/.*",
+    "headers": {
+      "Authorization": {
+        "absent": true
+      }
+    }
+  },
+  "response": {
+    "status": 401,
+    "headers": {
+      "Content-Type": "application/json",
+      "WWW-Authenticate": "Bearer"
+    },
+    "jsonBody": {
+      "error": "Unauthorized",
+      "message": "Authentication required",
+      "code": "AUTH_REQUIRED"
+    }
+  }
+}

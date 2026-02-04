@@ -62,6 +62,13 @@
             <artifactId>classgraph</artifactId>
             <version>4.8.174</version>
         </dependency>
+
+        <!-- WireMock for HTTP mocking -->
+        <dependency>
+            <groupId>org.wiremock</groupId>
+            <artifactId>wiremock-standalone</artifactId>
+            <version>3.3.1</version>
+        </dependency>
     </dependencies>
 
     <build>
