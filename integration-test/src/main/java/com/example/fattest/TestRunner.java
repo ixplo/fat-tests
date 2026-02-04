@@ -85,9 +85,8 @@ public class TestRunner {
         System.out.println("Tests skipped:   " + summary.getTestsSkippedCount());
         System.out.println("==========================================");
 
-        if (summary.getTestsFailedCount() > 0) {
-            System.exit(1);
-        }
+        // Exit with appropriate code (needed because WireMock/Spring threads keep JVM alive)
+        System.exit(summary.getTestsFailedCount() > 0 ? 1 : 0);
     }
 
     private static List<Class<?>> scanTestClassesInPackage(String packageName) {
