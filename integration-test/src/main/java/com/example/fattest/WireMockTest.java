@@ -1,35 +1,57 @@
 package com.example.fattest;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
+import org.wiremock.spring.ConfigureWireMock;
+import org.wiremock.spring.EnableWireMock;
+import org.wiremock.spring.InjectWireMock;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
+@EnableWireMock({
+    @ConfigureWireMock(
+        name = "api-service",
+        filesUnderClasspath = "wiremock"
+    )
+})
 class WireMockTest {
 
+    @InjectWireMock("api-service")
     private WireMockServer wireMockServer;
-    private RestTemplate restTemplate;
 
-    @BeforeEach
-    void setup() {
-        wireMockServer = WireMockConfig.createServer();
-        wireMockServer.start();
-        WireMockConfig.loadMappingsFromClasspath(wireMockServer);
-        restTemplate = new RestTemplate();
+    private final RestTemplate restTemplate = new RestTemplate();
+
+    private String getBaseUrl() {
+        return "http://localhost:" + wireMockServer.port();
     }
 
-    @AfterEach
-    void teardown() {
-        wireMockServer.stop();
+    @Test
+    @DisplayName("Should have mappings loaded from classpath")
+    void shouldHaveMappingsLoaded() {
+        System.out.println("=== WireMock Diagnostic ===");
+        System.out.println("WireMock running on port: " + wireMockServer.port());
+        System.out.println("Total stub mappings loaded: " + wireMockServer.getStubMappings().size());
+        System.out.println("Loaded mappings:");
+
+        wireMockServer.getStubMappings().forEach(stub -> {
+            String url = stub.getRequest().getUrlPattern() != null
+                ? stub.getRequest().getUrlPattern()
+                : stub.getRequest().getUrl();
+            System.out.println("  - " + stub.getRequest().getMethod() + " " + url + " -> " + stub.getResponse().getStatus());
+        });
+
+        System.out.println("===========================");
+
+        // We expect at least 7 mappings from wiremock/mappings/exceptions
+        assertTrue(wireMockServer.getStubMappings().size() >= 7,
+            "Expected at least 7 mappings to be loaded from wiremock/mappings/exceptions");
     }
 
     @Test
@@ -43,8 +65,7 @@ class WireMockTest {
                         .withBody("{\"id\": 1, \"name\": \"John Doe\", \"email\": \"john@example.com\"}")));
 
         // Act
-        String url = "http://localhost:" + wireMockServer.port() + "/api/users/1";
-        ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
+        ResponseEntity<String> response = restTemplate.getForEntity(getBaseUrl() + "/api/users/1", String.class);
 
         // Assert
         assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -67,14 +88,13 @@ class WireMockTest {
                         .withBody("{\"id\": 2, \"name\": \"Jane Doe\"}")));
 
         // Act
-        String url = "http://localhost:" + wireMockServer.port() + "/api/users";
         String requestBody = "{\"name\": \"Jane Doe\", \"email\": \"jane@example.com\"}";
 
         org.springframework.http.HttpHeaders headers = new org.springframework.http.HttpHeaders();
         headers.set("Content-Type", "application/json");
         org.springframework.http.HttpEntity<String> entity = new org.springframework.http.HttpEntity<>(requestBody, headers);
 
-        ResponseEntity<String> response = restTemplate.postForEntity(url, entity, String.class);
+        ResponseEntity<String> response = restTemplate.postForEntity(getBaseUrl() + "/api/users", entity, String.class);
 
         // Assert
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
@@ -96,10 +116,8 @@ class WireMockTest {
                         .withBody("{\"error\": \"User not found\"}")));
 
         // Act & Assert
-        String url = "http://localhost:" + wireMockServer.port() + "/api/users/999";
-
         try {
-            restTemplate.getForEntity(url, String.class);
+            restTemplate.getForEntity(getBaseUrl() + "/api/users/999", String.class);
             fail("Expected exception to be thrown");
         } catch (org.springframework.web.client.HttpClientErrorException e) {
             assertEquals(HttpStatus.NOT_FOUND, e.getStatusCode());
@@ -118,9 +136,8 @@ class WireMockTest {
                         .withBody("Delayed response")));
 
         // Act
-        String url = "http://localhost:" + wireMockServer.port() + "/api/slow";
         long startTime = System.currentTimeMillis();
-        ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
+        ResponseEntity<String> response = restTemplate.getForEntity(getBaseUrl() + "/api/slow", String.class);
         long duration = System.currentTimeMillis() - startTime;
 
         // Assert
@@ -134,10 +151,8 @@ class WireMockTest {
     @DisplayName("Should return 404 from pre-configured mapping")
     void shouldReturnNotFoundFromMapping() {
         // This uses the pre-configured mapping from not-found.json
-        String url = "http://localhost:" + wireMockServer.port() + "/api/users/0";
-
         try {
-            restTemplate.getForEntity(url, String.class);
+            restTemplate.getForEntity(getBaseUrl() + "/api/users/0", String.class);
             fail("Expected 404 exception");
         } catch (org.springframework.web.client.HttpClientErrorException e) {
             assertEquals(HttpStatus.NOT_FOUND, e.getStatusCode());
@@ -149,10 +164,8 @@ class WireMockTest {
     @DisplayName("Should return 500 from pre-configured mapping")
     void shouldReturnInternalErrorFromMapping() {
         // This uses the pre-configured mapping from internal-server-error.json
-        String url = "http://localhost:" + wireMockServer.port() + "/api/error";
-
         try {
-            restTemplate.getForEntity(url, String.class);
+            restTemplate.getForEntity(getBaseUrl() + "/api/error", String.class);
             fail("Expected 500 exception");
         } catch (org.springframework.web.client.HttpServerErrorException e) {
             assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, e.getStatusCode());
@@ -164,10 +177,8 @@ class WireMockTest {
     @DisplayName("Should return 429 rate limited from pre-configured mapping")
     void shouldReturnRateLimitedFromMapping() {
         // This uses the pre-configured mapping from rate-limited.json
-        String url = "http://localhost:" + wireMockServer.port() + "/api/rate-limited";
-
         try {
-            restTemplate.getForEntity(url, String.class);
+            restTemplate.getForEntity(getBaseUrl() + "/api/rate-limited", String.class);
             fail("Expected 429 exception");
         } catch (org.springframework.web.client.HttpClientErrorException e) {
             assertEquals(HttpStatus.TOO_MANY_REQUESTS, e.getStatusCode());
@@ -179,10 +190,8 @@ class WireMockTest {
     @DisplayName("Should return 503 service unavailable from pre-configured mapping")
     void shouldReturnServiceUnavailableFromMapping() {
         // This uses the pre-configured mapping from service-unavailable.json
-        String url = "http://localhost:" + wireMockServer.port() + "/api/maintenance";
-
         try {
-            restTemplate.getForEntity(url, String.class);
+            restTemplate.getForEntity(getBaseUrl() + "/api/maintenance", String.class);
             fail("Expected 503 exception");
         } catch (org.springframework.web.client.HttpServerErrorException e) {
             assertEquals(HttpStatus.SERVICE_UNAVAILABLE, e.getStatusCode());
