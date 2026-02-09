@@ -6,12 +6,12 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="fat-tests-integration-test" />
         <module name="fat-tests-app" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="fat-tests" target="1.5" />
+      <module name="fat-tests-integration-test" target="17" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">

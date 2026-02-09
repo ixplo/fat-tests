@@ -26,6 +26,5 @@
 
     <modules>
         <module>app</module>
-        <module>integration-test</module>
     </modules>
 </project>
