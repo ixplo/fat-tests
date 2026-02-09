@@ -125,13 +125,10 @@
                 </executions>
             </plugin>
 
-            <!-- Skip surefire tests -->
+            <!-- Run unit tests from src/test/java -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <skipTests>true</skipTests>
-                </configuration>
             </plugin>
 
             <!-- Spring Boot plugin - creates two jars -->
