@@ -3,10 +3,10 @@ package com.example.fattest;
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ClassInfo;
 import io.github.classgraph.ScanResult;
-import org.junit.platform.engine.discovery.ClassNameFilter;
 import org.junit.platform.engine.discovery.DiscoverySelectors;
 import org.junit.platform.launcher.Launcher;
 import org.junit.platform.launcher.LauncherDiscoveryRequest;
+import org.junit.platform.launcher.TestPlan;
 import org.junit.platform.launcher.core.LauncherDiscoveryRequestBuilder;
 import org.junit.platform.launcher.core.LauncherFactory;
 import org.junit.platform.launcher.listeners.SummaryGeneratingListener;
@@ -63,6 +63,7 @@ public class TestRunner {
         LauncherDiscoveryRequest request = requestBuilder.build();
 
         launcher.registerTestExecutionListeners(listener);
+        logTestPlan(launcher, request);
         launcher.execute(request);
 
         TestExecutionSummary summary = listener.getSummary();
@@ -87,6 +88,12 @@ public class TestRunner {
 
         // Exit with appropriate code (needed because WireMock/Spring threads keep JVM alive)
         System.exit(summary.getTestsFailedCount() > 0 ? 1 : 0);
+    }
+
+    private static void logTestPlan(Launcher launcher, LauncherDiscoveryRequest request) {
+        TestPlan testPlan = launcher.discover(request);
+        System.out.println("Test plan:");
+        testPlan.getRoots().forEach(root -> System.out.println("  - " + root.getDisplayName()));
     }
 
     private static List<Class<?>> scanTestClassesInPackage(String packageName) {

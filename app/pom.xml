@@ -137,9 +137,44 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
                     <mainClass>com.example.fattest.FatTestsApplication</mainClass>
+                    <!-- Exclude test dependencies from main app jar -->
+                    <excludeGroupIds>
+                        org.junit.jupiter,
+                        org.junit.platform,
+                        org.mockito,
+                        org.assertj,
+                        org.hamcrest,
+                        org.wiremock,
+                        org.wiremock.integrations,
+                        io.github.classgraph,
+                        net.bytebuddy,
+                        org.objenesis,
+                        org.skyscreamer,
+                        org.xmlunit,
+                        com.jayway.jsonpath,
+                        jakarta.xml.bind
+                    </excludeGroupIds>
+                    <excludes>
+                        <exclude>
+                            <groupId>org.springframework.boot</groupId>
+                            <artifactId>spring-boot-starter-test</artifactId>
+                        </exclude>
+                        <exclude>
+                            <groupId>org.springframework.boot</groupId>
+                            <artifactId>spring-boot-test</artifactId>
+                        </exclude>
+                        <exclude>
+                            <groupId>org.springframework.boot</groupId>
+                            <artifactId>spring-boot-test-autoconfigure</artifactId>
+                        </exclude>
+                        <exclude>
+                            <groupId>org.springframework</groupId>
+                            <artifactId>spring-test</artifactId>
+                        </exclude>
+                    </excludes>
                 </configuration>
                 <executions>
-                    <!-- Test runner jar (with classifier) -->
+                    <!-- Test runner jar (with classifier) - includes all dependencies -->
                     <execution>
                         <id>repackage-tests</id>
                         <goals>
@@ -148,6 +183,8 @@
                         <configuration>
                             <mainClass>com.example.fattest.TestRunner</mainClass>
                             <classifier>tests</classifier>
+                            <excludeGroupIds combine.self="override"/>
+                            <excludes combine.self="override"/>
                         </configuration>
                     </execution>
                 </executions>
