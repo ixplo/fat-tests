@@ -9,7 +9,7 @@ import org.springframework.core.env.Environment;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-class GreetingServiceTest {
+class GreetingServiceIT {
 
     @Autowired
     private GreetingService greetingService;

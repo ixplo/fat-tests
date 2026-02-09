@@ -9,7 +9,7 @@ import org.springframework.core.env.Environment;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-class ProfileConfigTest {
+class ProfileConfigIT {
 
     @Autowired
     private AppConfig appConfig;

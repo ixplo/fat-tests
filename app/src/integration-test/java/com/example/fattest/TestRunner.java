@@ -108,7 +108,7 @@ public class TestRunner {
 
             for (ClassInfo classInfo : scanResult.getAllClasses()) {
                 String className = classInfo.getName();
-                if (className.endsWith("Test")) {
+                if (className.endsWith("IT")) {
                     try {
                         testClasses.add(Class.forName(className));
                     } catch (ClassNotFoundException e) {
