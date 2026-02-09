@@ -138,19 +138,11 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <mainClass>com.example.fattest.FatTestsApplication</mainClass>
+                </configuration>
                 <executions>
-                    <!-- Main application jar -->
-                    <execution>
-                        <id>repackage-app</id>
-                        <goals>
-                            <goal>repackage</goal>
-                        </goals>
-                        <configuration>
-                            <mainClass>com.example.fattest.FatTestsApplication</mainClass>
-                            <classifier>app</classifier>
-                        </configuration>
-                    </execution>
-                    <!-- Test runner jar -->
+                    <!-- Test runner jar (with classifier) -->
                     <execution>
                         <id>repackage-tests</id>
                         <goals>
